@@ -1,0 +1,54 @@
+{
+    %set up various length
+    \ifx\titlepageleftcolumnwidth\undefined{}
+      \newlength{\titlepageleftcolumnwidth}
+      \newlength{\titlepagerightcolumnwidth}
+    \fi
+    \setlength{\titlepageleftcolumnwidth}{0.5\textwidth-\tabcolsep}
+    \setlength{\titlepagerightcolumnwidth}{\textwidth-2\tabcolsep-\titlepageleftcolumnwidth-1em}
+    %create title page
+    \thispagestyle{empty}
+    \noindent%
+    \begin{tabular}{@{}ll@{}}
+      \parbox{\titlepageleftcolumnwidth}{
+        %\includegraphics[width=0.4\titlepageleftcolumnwidth]{not_our_logo.jpg}
+      } &
+      \vspace{1cm}
+      \parbox{\titlepagerightcolumnwidth}{\raggedleft\sffamily\small
+      \textbf{\color{sectioning}}\Lyrebirds\\
+      \href{https://lyrebirds.dk}{https://lyrebirds.dk}
+     }\bigskip\\
+        \parbox[t]{\titlepageleftcolumnwidth}{
+          \textbf{\color{sectioning}\sffamily{Title:}}\\ \exploitname \bigskip\par
+          \textbf{\color{sectioning}\sffamily{Subtitle:}}\\ \projecttitle \bigskip\par
+          \textbf{\color{sectioning}\sffamily{Tested Product(s):}}\\ \product\bigskip\par
+          \textbf{\color{sectioning}\sffamily{Pages:}}~\pageref*{LastPageLabel}\bigskip\par
+          \vspace{0.5cm}
+          \begin{tabular}{|p{0.3\titlepageleftcolumnwidth}|p{0.5\titlepageleftcolumnwidth}|}
+            \hline
+            \multicolumn{2}{|l|}{\textbf{\color{sectioning}\sffamily{Document History}}}\\
+            \hline
+            Version & Date\\
+            \hline
+            1.0 & \multicolumn{1}{r|}{2019-08-26} \\ \hline
+            2.0 & \multicolumn{1}{r|}{2019-09-13} \\ \hline
+            2.1 & \multicolumn{1}{r|}{2019-10-21} \\ \hline
+            2.2 & \multicolumn{1}{r|}{2019-10-24} \\ \hline
+            2.3 & \multicolumn{1}{r|}{2019-10-28} \\ \hline
+            2.4 & \multicolumn{1}{r|}{2020-01-08} \\
+            \hline
+          \end{tabular}
+  } &
+      \parbox[t]{\titlepagerightcolumnwidth}{% right side column
+      \textbf{\color{sectioning}\sffamily{Executive Summary:}}\bigskip\par
+      \input{frontmatter/executive_summary.tex}
+      }\\
+    \end{tabular}
+    \vfill
+    
+    \begin{flushright}
+      \small
+      \noindent \copyright{} \Lyrebirds
+    \end{flushright}
+    \clearpage
+  }

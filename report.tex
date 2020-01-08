@@ -1,0 +1,95 @@
+% Enable warnings on deprecated things.
+\RequirePackage[l2tabu, orthodox]{nag}
+
+\documentclass{scrreprt}
+
+% Load custom packages+settings and commands.
+\newcommand{\exploitname}{Cable Haunt}
+\input{style_and_commands/style.sty}
+\input{style_and_commands/commands}
+
+
+\begin{document}
+
+%\linenumbers
+
+% Cover page.
+\let\oldthepage\thepage{}
+\renewcommand\thepage{Cover}
+\bookmark[page=1,level=0]{Cover}
+\tikzexternaldisable{}
+\begin{titlepage} % Suppresses displaying the page number on the title page and the subsequent page counts as page 1
+	
+	\raggedleft % Right align the title page
+	
+	\rule{1pt}{\textheight} % Vertical line
+	\hspace{0.05\textwidth} % Whitespace between the vertical line and title page text
+	\parbox[b]{0.75\textwidth}{ % Paragraph box for holding the title page text, adjust the width to move the title page left or right on the page
+		
+		{\Huge\bfseries \exploitname{}}\\[2\baselineskip] % Title
+		{\large\textit{\projecttitle{}}}\\[4\baselineskip] % Subtitle or further description
+		
+		\vspace{0.5\textheight} % Whitespace between the title block and the publisher
+		
+		{\noindent \copyright{} \Lyrebirds}\\[\baselineskip] % Publisher and logo 
+	}
+
+\end{titlepage}
+\tikzexternalenable{}
+\renewcommand\thepage{\oldthepage}
+
+\input{frontmatter/colophon.tex}
+
+% Start roman numbering.
+\cleardoublepage{}
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+\bookmark[page=3,level=0]{Title Page}
+\input{frontmatter/titlepage.tex}
+% \bookmark[page=5,level=0]{Preface}
+% \input{../frontmatter/preface.tex}\par
+
+% Table of contents.
+\bookmark[page=7,level=0]{Contents}
+\microtypesetup{protrusion=false} % Protrusion may interfere with the dotted lines in the TOC.
+\ohead{{\MakeUppercase\leftmark}} % UGLY HACK. The correct way should be to store the old value, set new value, then restore old value!
+{
+\hypersetup{linkbordercolor=black}
+\hypersetup{linkcolor=black}
+\tableofcontents
+}
+\microtypesetup{protrusion=true}
+
+% Start arabic numbering and restore page header.
+\cleardoublepage{}
+\ohead{{\MakeUppercase\leftmark}\rightmark}
+\pagenumbering{arabic}
+
+% Main content.
+\input{introduction}
+\input{architecture}
+\input{spectrum_analyzer}
+\input{dns_rebind}
+\label{LastPageLabel} % There must be a %-sign on the line before this.
+
+% To end the parts.
+\bookmarksetup{startatroot}
+\addtocontents{toc}{\bigskip}
+
+\cleardoublepage
+\ohead{{\MakeUppercase\leftmark}} % UGLY HACK. The correct way should be to store the old value, set new value, then restore old value!
+
+% Bibliography.
+
+% Appendix
+\begin{appendices}
+\input{explored_modems}
+\input{technical_replication}
+\input{how_we_found_out}
+\end{appendices}
+%
+
+\listoffixmes
+
+\end{document}

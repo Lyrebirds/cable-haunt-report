@@ -1,0 +1,13 @@
+{
+    "jsonrpc":"2.0",
+    "method":"Frontend::GetFrontendSpectrumData"
+    ,"params":{
+      "coreID":0,
+      "fStartHz":0,
+      "fStopHz":1000000000,
+      "fftSize":1024,
+      "gain":1,
+      "numOfSamples":256
+      }
+    ,"id":"0"
+  }

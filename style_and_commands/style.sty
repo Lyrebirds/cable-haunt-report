@@ -1,0 +1,429 @@
+%\usepackage{etex} % Uncomment if shortage of latex registers.
+
+% Silence certain warnings.
+  \usepackage{silence} % http://33.media.tumblr.com/tumblr_ly63ddiYtu1r7uivno1_400.gif
+  %\WarningFilter{latex}{Marginpar on page} % Marginpar on page xx moved.
+  %\WarningFilter{tocstyle}{THIS IS AN ALPHA VERSION!}
+  \WarningFilter{scrreprt}{\float@listhead detected!}
+
+% Set up some variables.
+  \usepackage{etoolbox}
+
+  % Set to true for print version, false for screen reading version.
+  % Screen reading version for example uses coloring of PDF links.
+  \newtoggle{printversion}
+  % Set true for PDF version ready for print. False for screen version.
+  \settoggle{printversion}{false}
+
+% LaTeX and KOMA fixes.
+  %\usepackage{fixltx2e}
+  \usepackage{fixmath}
+  \usepackage{scrhack}
+
+% Basic page layout.
+  \KOMAoptions{
+    paper=a4,
+    twoside=true,
+    open=right,
+    %parskip=half, % To make space between paragraphs.
+    fontsize=11pt,
+    numbers=noenddot
+  }
+
+  % Hacketyhackhack for parskip
+  %\setparsizes{0}{0.25\baselineskip plus .25\baselineskip}{1em plus 1fil}
+
+  % Margins.
+  \usepackage{typearea}
+
+  % Set binding correction area.
+  \KOMAoptions{
+    BCOR=10mm
+  }
+
+  % Headings.
+  \usepackage[automark, headsepline=.3pt:head]{scrlayer-scrpage}
+    \pagestyle{scrheadings}
+    \ohead{{\MakeUppercase\leftmark}\rightmark}
+
+    % Delete the number from sections.
+    \renewcommand*{\sectionmarkformat}{:\enspace}
+    \renewcommand*{\chaptermarkformat}{}
+
+    % Font in header and footer.
+    \setkomafont{pagehead}{\footnotesize\normalfont\sffamily}
+    \setkomafont{pagenumber}{\footnotesize\normalfont\sffamily}
+
+    % Line numbering.
+    \usepackage{lineno}
+
+% Language and fonts.
+  % Encoding.
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+
+  % Hyphenation.
+  \usepackage[english]{babel}
+  %\usepackage{hyphenat} % Allow already hyphenated words to be hyphenated.
+
+  % Fonts.
+  \usepackage[bitstream-charter]{mathdesign} % Serif font (Charter BT).
+  \usepackage[scaled=0.84]{DejaVuSansMono} % Monospaced font.
+  \def\sfdefault{SourceSansPro-TLF} % Sans serif font.
+  %\usepackage{emerald}
+
+  % Typographic tweaks.
+  \usepackage[babel]{microtype} % Enables kerning. Load after fonts.
+  \usepackage{textcomp} % Uses the glyphs present in the fonts, rather than LaTeX workarounds for old fonts.
+
+  % Chapters style.
+  \setkomafont{chapter}{\normalfont\Huge\fontseries{k}\sffamily\color{chaptercolor}}
+  % Spacing before chapter.
+  \renewcommand{\chapterheadstartvskip}{\vspace*{1\baselineskip}}
+
+  % Sections style.
+  \setkomafont{section}{\normalfont\Large\fontseries{k}\sffamily\color{sectioning}}
+
+  % Subsections style.
+  \setkomafont{subsection}{\normalfont\large\fontseries{k}\sffamily\color{subsectioning}}
+
+  % Subsubsections style.
+  \setkomafont{subsubsection}{\normalfont\normalsize\fontseries{k}\sffamily\color{subsectioning}}
+
+  % Section numbering in margin.
+  %\renewcommand*{\othersectionlevelsformat}[3]{%
+  %  \llap{#3\autodot\enskip}}
+
+  % Lists and similar.
+  \renewcommand{\descriptionlabel}[1]{\hspace{\labelsep}\color{descriptionlabeling}\sffamily{\textbf{#1}}}
+
+  % Stretch arrays (in tabulars).
+  \renewcommand{\arraystretch}{1.1}
+
+% Maths
+  \usepackage{amsmath}
+  \usepackage{mathtools}
+  \DeclarePairedDelimiter\set\{\}
+  \usepackage[group-separator={,}]{siunitx}
+  \newcommand{\argmax}{\arg\ \!\max} % AlfC
+  % Better set notation:
+  \DeclarePairedDelimiterX{\Set}[1]\{\}{%
+    \, #1 \,
+  }
+
+  %\newcommand{\cs}[1]{\texttt{\symbol{`\\}#1}}
+
+% Floats
+  % Grouping floats together.
+  \usepackage{newfloat}
+  \DeclareFloatingEnvironment{groupfloat}
+  \usepackage{placeins} % Defines the \FloatBarrier
+
+  % Captions.
+  %\KOMAoptions{captions=oneline}
+  \KOMAoption{captions}{centeredbeside}
+  \setcapindent{1em}
+  \setkomafont{captionlabel}{\sffamily\color{sectioning}\bfseries}
+  \setkomafont{caption}{\sffamily}
+
+  % Subfigures
+  \usepackage{subcaption}
+
+% Graphics and colors.
+  \usepackage{graphicx}
+  \graphicspath{{graphics/}}
+
+  \usepackage[table,xcdraw]{xcolor}
+    % Text colors.
+    \definecolor{black}{gray}{0.0}
+    \definecolor{partcolor}{gray}{0.17}
+    \definecolor{chaptercolor}{gray}{0.17}
+    \definecolor{sectioning}{gray}{0.28}
+    \definecolor{subsectioning}{gray}{0.35}
+    \definecolor{descriptionlabeling}{gray}{0.35}
+    % Hyperlink colors.
+    \definecolor{pdflinkcolor}{RGB}{36,42,158}
+    \definecolor{urlcolor}{RGB}{133,52,52}
+    % Box colors.
+    \definecolor{clframe}{gray}{0.75}
+    \definecolor{clshade}{gray}{0.95}
+    \definecolor{clcodeshade}{gray}{0.93}
+    \definecolor{clnode}{gray}{0.85}
+
+    % Graphs.
+    \definecolor{color1}{cmyk}{100,50,0,0} % blue
+    \definecolor{color2}{cmyk}{0,80,100,0} % vermillion
+    \definecolor{color3}{cmyk}{97,0,75,0}  % blueish green
+    \definecolor{color4}{cmyk}{10,70,0,0}  % reddish purple
+    \definecolor{color5}{cmyk}{0,50,100,0} % orange
+    \definecolor{color6}{cmyk}{80,0,0,0}   % sky blue
+
+    \definecolor{colorA}{HTML}{5DA5DA} % blue
+    \definecolor{colorB}{HTML}{FAA43A} % orange
+    \definecolor{colorC}{HTML}{60BD68} % green
+    \definecolor{colorD}{HTML}{F17CB0} % pink
+    \definecolor{colorE}{HTML}{B2912F} % brown
+    \definecolor{colorF}{HTML}{B276B2} % purple
+    \definecolor{colorG}{HTML}{DECF3F} % yellow
+    \definecolor{colorH}{HTML}{F15854} % red
+    \definecolor{colorI}{HTML}{4D4D4D} % gray
+
+    \colorlet{colorAshade}{colorA!80!black}
+    \colorlet{colorBshade}{colorB!80!black}
+    \colorlet{colorCshade}{colorC!80!black}
+    \colorlet{colorDshade}{colorD!80!black}
+    \colorlet{colorEshade}{colorE!80!black}
+    \colorlet{colorFshade}{colorF!80!black}
+    \colorlet{colorGshade}{colorG!80!black}
+    \colorlet{colorHshade}{colorH!80!black}
+    \colorlet{colorIshade}{colorI!80!black}
+
+    % Code colors.
+    \definecolor{javared}{rgb}{0.6,0,0}            % for strings
+    \definecolor{javagreen}{rgb}{0.25,0.5,0.35}    % comments
+    \definecolor{javapurple}{rgb}{0.6,0,0.5}       % keywords
+    \definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
+
+    % JSON colors.
+    \colorlet{punct}{red!60!black}
+    \definecolor{background}{HTML}{EEEEEE}
+    \definecolor{delim}{RGB}{20,105,176}
+    \colorlet{numb}{magenta!60!black}
+
+
+  \usepackage{tikz}
+  \usepackage{pgfplots}
+    \pgfplotsset{compat=1.10}
+    \pgfplotsset{
+      every axis label/.append style={font=\footnotesize},
+      every axis/.append style={font=\scriptsize}
+    }
+  \usepackage{pgfplotstable}
+  \usepackage{tikz-qtree}
+  \usepackage{pgfgantt}
+  \usetikzlibrary{calc}
+  \usetikzlibrary{decorations.pathmorphing, decorations.pathreplacing}
+  \usetikzlibrary{backgrounds, matrix, arrows.meta, shapes, positioning, fit}
+  \usepgfplotslibrary{external}
+  \tikzexternalize[prefix=graphics/tikz/]
+  %\tikzexternaldisable % Disable by default
+
+  \usetikzlibrary{matrix, shapes, positioning, shapes, arrows, trees}
+
+  \tikzstyle{bigblock} = [thick, rectangle, draw, fill=clnode, text width=4.5em, text centered, minimum height=4em]
+  \tikzstyle{smallblock} = [thick, rectangle, draw, fill=clnode, text width=4.5em, text centered, minimum height=3em]
+  \tikzstyle{database} = [thick, cylinder, draw, shape border rotate=90, aspect=0.15, fill=clnode, text width=3em, text centered, minimum height=4em]
+  \tikzstyle{line} = [draw, -stealth, thick]
+  %\tikzstyle{model} = [draw, ellipse,fill=red!20, minimum height=2em]
+  \tikzstyle{container} = [rectangle, draw, inner sep=0.6 cm, dashed, fill=clshade]
+  \tikzstyle{node} = [thick, circle, draw, fill=clnode, text width=1.5em, text centered, minimum height=1.5em]
+
+% Code and monospaced things.
+  %\usepackage{algorithm}
+  %\usepackage{algorithmic}
+  \usepackage{listings}
+
+  \lstdefinestyle{javastyle}{%
+    language=Java,
+    keywordstyle=\color{javapurple}\bfseries,
+    stringstyle=\color{javared},
+    commentstyle=\color{javagreen},
+    morecomment=[s][\color{javadocblue}]{/**}{*/}
+  }
+
+  \lstnewenvironment{javacode}[1][]{%
+    \lstset{style=javastyle, #1}
+  }{}
+
+  \lstdefinestyle{pythonstyle}{%
+    language=Python,
+    keywordstyle=\color{javapurple}\bfseries,
+    stringstyle=\color{javared},
+    commentstyle=\color{javagreen}
+  }
+
+  \lstnewenvironment{pythoncode}[1][]{%
+    \lstset{style=pythonstyle, #1}
+  }{}
+
+  \lstdefinelanguage{Groovy}[]{Java}{%
+    keywordstyle=\color{javapurple}\bfseries,
+    stringstyle=\color{javared}\ttfamily,
+    keywords=[3]{each, findAll, groupBy, collect, inject, eachWithIndex},
+    morekeywords={def, as, in, use},
+    moredelim=[is][\textcolor{darkgray}]{\%\%}{\%\%},
+    moredelim=[il][\textcolor{darkgray}]{§§}
+  }
+
+  \lstdefinelanguage{json}{
+    basicstyle=\normalfont\ttfamily,
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{background},
+    literate=
+     *{0}{{{\color{numb}0}}}{1}
+      {1}{{{\color{numb}1}}}{1}
+      {2}{{{\color{numb}2}}}{1}
+      {3}{{{\color{numb}3}}}{1}
+      {4}{{{\color{numb}4}}}{1}
+      {5}{{{\color{numb}5}}}{1}
+      {6}{{{\color{numb}6}}}{1}
+      {7}{{{\color{numb}7}}}{1}
+      {8}{{{\color{numb}8}}}{1}
+      {9}{{{\color{numb}9}}}{1}
+      {:}{{{\color{punct}{:}}}}{1}
+      {,}{{{\color{punct}{,}}}}{1}
+      {\{}{{{\color{delim}{\{}}}}{1}
+      {\}}{{{\color{delim}{\}}}}}{1}
+      {[}{{{\color{delim}{[}}}}{1}
+      {]}{{{\color{delim}{]}}}}{1},
+}
+
+  \lstnewenvironment{gradlecode}[1][]{%
+    \lstset{language=Groovy, #1}
+  }{}
+
+  \lstset{
+    columns=flexible,
+    escapechar=",
+    escapeinside={(*@}{@*)},
+    basicstyle=\ttfamily\footnotesize,
+    frame=single, backgroundcolor=\color{clshade}, rulecolor=\color{clframe},
+    framerule=\fboxrule, xleftmargin=3.4pt, xrightmargin=3.4pt, belowskip=\smallskipamount,
+    captionpos=b,
+    numbers=left,
+    numberstyle=\scriptsize,
+    numbersep=7pt,
+    tabsize=2,
+    keepspaces=true,
+    showspaces=false,
+    showstringspaces=false,
+    breaklines=true,
+    breakatwhitespace=true,
+    postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}}
+  }
+
+% Frames
+  \usepackage{mdframed}
+
+% Tables
+  \usepackage{booktabs} % Nicer typesetting of tables.
+  \usepackage{array}
+  \usepackage{multirow}
+  \usepackage{supertabular}
+  \usepackage{longtable}
+
+% Lists
+  \usepackage{enumerate}
+  \usepackage[inline]{enumitem} % Customization of enumerate environments + inline lists.
+  %\usepackage{paralist} % Inline lists and more.
+
+% BibLaTex
+  \usepackage[autostyle]{csquotes}
+  \usepackage[
+    backend=biber,
+    citestyle=numeric-verb,
+    bibstyle=ieee,
+    hyperref=true,
+    abbreviate=true,
+    url=true,
+  ]{biblatex}
+
+  % Fix for some LaTeX editors inability to parse new \addbibresource
+  \makeatletter
+  \@ifpackageloaded{biblatex}{\addbibresource{references/references.bib}}{\bibliography{references/references}}
+  \makeatother
+
+  \setcounter{biburlnumpenalty}{300} % Enable breaking URLs in bibliography after numbers
+  \setcounter{biburlucpenalty}{300} % Enable breaking URLs in bibliography after uppercase letters
+  \setcounter{biburllcpenalty}{300} % Enable breaking URLs in bibliography after lowercase letters
+  \DeclareNameAlias{sortname}{last-first}
+  \DeclareNameAlias{default}{last-first}
+
+ % Appendix
+  \usepackage[titletoc]{appendix}
+
+% PDF
+  \usepackage{hyperref}
+  \hypersetup{
+    bookmarksnumbered,
+    bookmarksdepth=1,
+    pdfauthor={Lyrebirds.dk}, % PDF tag.
+    pdftitle={\exploitname Exploit}, % PDF tag.
+    pdfsubject={Exploit Report},
+    pdfpagelayout=TwoPageRight,
+    pdfdisplaydoctitle,
+    breaklinks,
+    linktoc=all
+    %plainpages=false
+  }
+  \iftoggle{printversion}{
+    % Outputting PDF for printing
+    \hypersetup{
+      colorlinks,
+      linkcolor=black,
+      citecolor=black,
+      urlcolor=black
+    }
+  }{
+    % Outputting PDF for screen reading
+    \hypersetup{
+      colorlinks,
+      linkcolor=pdflinkcolor,
+      citecolor=pdflinkcolor,
+      urlcolor=pdflinkcolor
+    }
+  }
+  \pdfminorversion=5
+  \pdfobjcompresslevel=2
+  \usepackage{pdfpages}
+  \usepackage{bookmark}
+
+% Comments/todos
+  \usepackage{fixme}
+    \fxsetup{
+        status=final,
+        author={Todo},
+        layout=inline,
+				%marginclue,
+        theme=color,
+        silent=true
+    }
+  %\usepackage{todonotes}
+
+% Misc.
+  \usepackage{lastpage}
+  \usepackage{multicol}
+  \usepackage{xspace}
+  \usepackage{soul}
+  \usepackage{dirtree}
+  \usepackage[super]{nth}
+
+% TOC.
+  %\usepackage{tocstyle} % MUST be loaded after pdfpages!
+  %\usetocstyle{KOMAlike}
+  \setcounter{tocdepth}{1}
+  %\settocstylefeature{pagenumberhook}{\sffamily}
+  %\settocstylefeature{entryhook}{\sffamily}
+  %\settocstylefeature[-1]{entryhook}{\Large\sffamily\bfseries}
+  %\settocstylefeature[0]{entryhook}{\sffamily}
+  %\settocstylefeature[1]{entryhook}{\small\sffamily}
+  % If page numbers in TOC are more than 3 digits.
+  %\makeatletter
+  %\renewcommand{\@pnumwidth}{3em}
+  %\renewcommand{\@tocrmarg}{4em}
+  %\makeatother
+  %\addtokomafont{chapterentry}{\sffamily}
+
+% load cleveref to enable \cref{} commands
+% load this very late
+\usepackage[capitalise,noabbrev,nameinlink]{cleveref}
+
+\usepackage{pgf-umlsd}
+
+\usepackage{makecell}

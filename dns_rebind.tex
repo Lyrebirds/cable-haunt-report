@@ -1,0 +1,51 @@
+\chapter{Gaining Access Externally}
+\label{cha:dns}
+The CM itself is not exposed directly to the internet, and can only be accessed from within the local network.
+This should not be considered a security measure, as the local network is not always protected.
+\exploitname{} gains access to the local network, by having the victim execute malicious code in their browser.
+While cross-origin resource sharing (CORS) rules usually prevents this attack, all cable modems listed in \appendixref{app:ExploredRouters} were found vulnerable to DNS Rebinding attacks and direct javascript requests.
+It is unlikely that this is an exhaustive list.
+Additionally, there are other ways to circumvent CORS security in the browser and the attacks work from any system connected to the network.
+
+\section{Executing the attack}
+The attack can be executed by having the victim run malicious javascript.
+A common avenue of attack would be a link that is opened in a browser, but could for example, also be done through ads on a trusted website or insecure email clients.
+The exploit starts when the malicious code has been sent to the client, and is being executed.
+There are two verified ways of executing the request towards the modem.
+
+\section{Direct Javascript Request}
+Here the javascript running in the browser establishes a websocket connection, directly to the modem via the local IP address found in \appendixref{app:ExploredRouters}.
+Websocket is not explicitly covered by CORS and SOP\footnote{\url{https://knoxxs.github.io/programming/javascript/cors/2015/11/17/understanding-sop-cors\#what-about-websockets}}. 
+Therefore, browsers should not be relied upon to prevent this, as some will not. 
+While browsers will set the \mono{origin} parameter on all websocket requests, it is the servers responsibility to reject the request as needed. 
+None of tested modems reject these types of requests.
+
+\section{DNS Rebinding}
+DNS rebinding utilizes the attackers control over their DNS server to circumvent CORS. After the initial request the the DNS server will start resolving the domain name to the local IP of modem. The javascript will keep trying to establish the websocket connection to the domain name and after a varying amount of time, usually between 10 seconds and 1 minute, the browser will update the IP to the local, enabling the connection. Since the websocket connection is established against the same domain name CORS is not violated. Servers should reject any requests, which are sent towards a hostname that is not explicitly recognized. For the case of a modem on the local network, this should be limited to its IP, however no tested modems had such preventive measures.
+The steps of the attack are outlined below, and can be seen in \cref{fig:dns_attack}.
+
+\begin{itemize}
+    \item The victim clicks the malicious link, and the initial request is made from the victims browser.
+    \begin{itemize}
+      \item The domain name is resolved to the public IP of the malicious server.
+    \end{itemize}
+    \item As the initial request resolves, the website returns the malicious code which launches the attack.
+    \item The DNS time-to-live option is set very low, causing the client to prompt the server for its IP again.
+    \item Instead of resolving to the actual IP of the server, this time it returns the local IP for the CM.
+    \item The malicious code loops until it gets a successful request from the modem.
+    \begin{itemize}
+        \item Depending on the browser and OS DNS caching settings, this will usually take up to a minute.
+    \end{itemize}
+    \item The client will now start sending requests towards the CM, in particular the spectrum analyzer.
+\end{itemize}
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{dns_attack.png}
+  \caption{Sequence diagram of DNS Rebinding}
+  \label{fig:dns_attack}
+\end{figure}
+
+Some modems requires basic authorization before requests are accepted, however all tested modems have working default credentials.
+A complete list of the explored modems and their default credentials can be found in \appendixref{app:ExploredRouters}.
+In the case of basic authorization protection, the malicious website should be set up with the same credentials as the target modem.
+These credentials should then be added to the link, such as \url{http://username:password@malicioussite.com}, which will make the browser use these credential on every request, even after resolving to another IP.

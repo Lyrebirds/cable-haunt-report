@@ -1,0 +1,15 @@
+\chapter{Introduction}
+
+This report covers the \exploitname{} vulnerabilities found in \product{} by \Lyrebirds.
+The purpose of the report is to responsibly disclose the vulnerabilities, such that manufactures, ISPs, businesses and end users are aware of the danger associated with the use of \product.
+
+The exploit is explained from the inside out, starting with the architecture of the \product.
+Then the attack on the spectrum analyzer is presented, which is the central part of gaining complete control over the cable modem.
+Afterwards, the DNS rebind attack is explained, which enables remote access to the spectrum analyzer exploit. 
+Without this DNS rebind attack, the spectrum analyzer would only be exploitable on the local network.
+
+In the appendices is a list of the modems confirmed as vulnerable, exploitation of a specific cable modem and guides and help on exploring the vulnerabilities and expanding them to other modems.
+
+% The current response from Broadcom states that since they are phasing out their own firmware they have no firmware that fixes the exploit. 
+% However Lyrebirds.dk have worked with several Danish ISPs and found ways of fixing the issue, which should be available for any ISP with affected hardware.
+% Some of the contacted ISPs are currently in the process of rolling out fixed versions.

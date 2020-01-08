@@ -1,0 +1,118 @@
+% Project related.
+  % Project information.
+  
+  \newcommand{\product}{Broadcom cable modems}
+  \newcommand{\recipiants}{LiveOverflow}
+  \newcommand{\projecttitle}{Vulnerability Report: \product}
+  \newcommand{\Lyrebirds}{\mbox{Lyrebirds ApS}}
+
+% Custom styling commands.
+  % Monospaced text.
+  \newcommand*\justify{%
+    \fontdimen2\font=0.4em% interword space
+    \fontdimen3\font=0.2em% interword stretch
+    \fontdimen4\font=0.1em% interword shrink
+    \fontdimen7\font=0.1em% extra space
+    \hyphenchar\font=`\-% allowing hyphenation
+  }
+  \newcommand{\mono}[1]{\texttt{\justify {#1}}}
+
+  % Code mono
+  \newcommand{\code}[1]{\sethlcolor{clcodeshade}\hl{\texttt{\justify{#1}}}} % Yes, this line is identical to the one in \mono, however the soul-package is fragile, and cannot see into another command.
+  \soulregister{\justify}{1}
+
+  % Chapter introductions.
+  \newcommand{\chapterintro}[1]{#1}
+
+  % Margin text.
+  \newcommand{\margintext}[1]{\marginline{\textsf{\footnotesize #1}}}
+
+  % Todo.
+  \newcommand{\todo}[1]{\fxnote{#1}}
+  \newcommand{\todolater}[1]{\fxnote{\color{purple}#1}}
+
+  % Dummy line.
+  \newcommand{\dummy}{\todo{\color{black}Lorem ipsum dolor sit amet, consectetur adipiscing elit.}}
+
+% Document structure.
+  % Sprints.
+
+  % Document organization.
+  \newenvironment{documentorganization}
+    {\vspace{.5cm}\noindent\textbf{Report Organization}\quad The remainder of this report is organized in the following fashion:\begin{itemize}}
+    {\end{itemize}}
+
+  % Chapter organization.
+  \newenvironment{chapterorganization}
+    {\vspace{.5cm}\noindent\textbf{Chapter Organization}\quad This chapter is organized in the following fashion:\begin{itemize}}
+    {\end{itemize}}
+
+   % Abbreviation.
+  \newenvironment{abbreviations}
+    {\vspace{.5cm}\noindent\textbf{Chapter Abbreviations}\quad This chapter introduces the following abbreviations:\begin{addmargin}[\leftmargin]{0em}\begin{multicols}{2}\begin{description}[noitemsep, style=sameline]}
+    {\end{description}\end{multicols}\end{addmargin}}
+
+% Figures.
+  % Normal figure.
+  \newcommand{\fig}[3]{
+    \begin{figure}[tbp]
+      \centering
+      %\rule{\textwidth}{0.005in}
+      \includegraphics[width=0.75\textwidth]{#1}
+      \caption[#2]{#3}\label{fig:#1}
+      %\rule{\textwidth}{0.005in}
+    \end{figure}
+  }
+
+  % Scaled figure.
+  \newcommand{\figscaled}[4]{
+    \begin{figure}[tbp]
+      \centering
+      \includegraphics[scale=#4]{#1}
+      \caption[#2]{#3}\label{fig:#1}
+    \end{figure}
+  }
+
+  % Figure with custom width.
+  \newcommand{\figcustomwidth}[4]{
+    \begin{figure}[tbp]
+      \centering
+      \includegraphics[width=#4]{#1}
+      \caption[#2]{#3}\label{fig:#1}
+    \end{figure}
+  }
+
+% References.
+  \newcommand{\appendixref}[1]{\hyperref[#1]{Appendix \ref*{#1}}}
+  \newcommand{\chapterref}[1]{\hyperref[#1]{Chapter \ref*{#1}}}
+  \newcommand{\sectionref}[1]{\hyperref[#1]{Section \ref*{#1}}}
+  \newcommand{\figureref}[1]{\hyperref[#1]{Figure \ref*{#1}}}
+  \newcommand{\tableref}[1]{\hyperref[#1]{Table \ref*{#1}}}
+  \newcommand{\listingref}[1]{\hyperref[#1]{Listing \ref*{#1}}}
+  \newcommand{\onpage}[1]{on \hyperref[#1]{page \pageref*{#1}}}
+  \newcommand{\equationref}[1]{\hyperref[#1]{Equation \ref*{#1}}}
+  \newcommand{\algorithmref}[1]{\hyperref[#1]{Algorithm \ref*{#1}}}
+
+% Fix todo notes with externalize
+\let\oldTodo\todo
+\renewcommand{\todo}[1]{\tikzexternaldisable{}\oldTodo{#1}\tikzexternalenable{}}
+
+% A better plus minus sign.
+\makeatletter
+\newcommand{\gpm}{\mathbin{\mathpalette\@gpm\relax}}
+\newcommand{\@gpm}[2]{\ooalign{%
+  \raisebox{.1\height}{$#1+$}\cr
+  \smash{\raisebox{-.6\height}{$#1-$}}\cr}}
+\makeatother
+
+% Nice shaded box for formal text.
+\newmdenv[
+  nobreak=true,
+  suppressfirstparskip,
+  topline=false,
+  rightline=false,
+  bottomline=false,
+  linewidth=2.5pt,
+  linecolor=clframe,
+  backgroundcolor=clshade]{formal}
+  
