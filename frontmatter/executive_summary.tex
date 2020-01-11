@@ -1,4 +1,4 @@
 This report outlines the \exploitname{} vulnerabilities found in \product. \bigskip \\
-The cable modems are vulnerable to a DNS Rebind Attack followed by overflowing the registers and executing malicious functionality.
-The exploit is possible due to lack of protection against DNS Rebind Attacks, default credentials and a programming error in the spectrum analyzer.
+The cable modems are vulnerable to remote code execution through a websocket connection, bypassing normal CORS and SOC rules, and then subsequently by overflowing the registers and executing malicious functionality.
+The exploit is possible due to lack of protection proper authorization of the websocket client, default credentials and a programming error in the spectrum analyzer.
 These vulnerabilities can give an attacker full remote control over the entire unit, and all the traffic that flows through it, while being invisible for both the user and ISP and able to ignore remote system updates.
