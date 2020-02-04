@@ -1,97 +1,48 @@
 \chapter{Technical Replication}
 \label{app:technical_replication}
-This chapter explain one specific way of testing wether a modem in question is affected by \exploitname{}.
+This chapter explain how to run the proof of concept exploit for two of the vulnerable cable modems.
 However, if this example can not be replicated successfully for a given modem, it could still be vulnerable to variations of the exploit.
-The example is done locally from a Linux machine, but emulates how the exploit can be done from outside the local network.
 
 \section{Requirements}
-There are three elements to set up in this test: The modem to be exploited, the malicious server doing the attack, and the victim.
-For simplicity, the malicious server running the attack, will be hosted on the same linux machine, from which the victim is operating.
-It is assumed that the linux machine is on the local network with the modem, as a victim would be.
-
-Internet is not required during the proof of concept, however the following software should be installed beforehand:
+There are three elements to set up in this test: The modem to be exploited, the malicious server doing the attack, and a victim to access the malicious site.
+Internet is not required during the proof of concept, however if not both the victim and attack must be on the modems lan network. The following software should be installed beforehand:
 
 \begin{itemize}
-    \item Web server hosting malicious javascript: \url{https://github.com/zanderdk/3890_exploit}
-    \item Whonow DNS Server: \url{https://github.com/brannondorsey/whonow}.
+    \item python and flask
+    \item python pwntools:
     \begin{itemize}
-        \item Or use another DNS rebind tool of your choice.
+        \item \url{http://docs.pwntools.com/en/stable/}
     \end{itemize}
-    \item NPM and Nodejs
-    \item iptables // default on most Linux distros.
+    \item Web server hosting malicious javascript for F@st-3890 and TC7230: 
+    \begin{itemize}
+        \item \url{https://github.com/Lyrebirds/sagemcom-fast-3890-exploit/blob/master/exploit.py}
+        \item \url{https://github.com/Lyrebirds/technicolor-tc7230-exploit}
+    \end{itemize}
 \end{itemize}
 
-\section{Installation}
-These are the steps to setting up the test.
-
-\subsection{whonow}
-First step is to run whonow with the follow command, substituting 12345 with the actual port of the spectrum analyzer on the target modem, see \cref{app:ExploredRouters}.
-\begin{lstlisting}[numbers=none]
-whonow -d 127.0.0.1 --port 12345
-\end{lstlisting}
-To simulate that whonow is the dns server for a domain that you own, we change the /etc/resolv.conf file. 
-This file controls which dns server our computer will be using.
-
-\begin{lstlisting}[numbers=none]
-sudo sh -c 'echo "nameserver 127.0.0.1" > /etc/resolv.conf'
-\end{lstlisting}
-This will make localhost the initial DNS server which your computer will request, and whonow will afterwards respond to all DNS requests.
-Whonow will use rules specified in subdomains to determine which IP to resolve to.\footnote{Whonow is described at \url{https://github.com/brannondorsey/whonow}.}
-If no rules are specified it will return 127.0.0.1. 
-This will simulate that whonow controls all domains.
-
-\subsection{iptables}
-Next, set up iptables to redirect port 53 to the whonow server, again substituting the port to the one matching the target modem.
-
-\begin{lstlisting}[numbers=none]
-iptables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-port 12345
-iptables -t nat -I OUTPUT -p udp -d 127.0.0.1 --dport 53 -j REDIRECT --to-ports 12345
-\end{lstlisting}
+\section{Configuration}
+In the static js file change the connection string on line 424 to the port and ip which your target modem uses for the spectrum analyzer. 
+If the spectrum analyzer is protected by basic auth set change the username and password as well.
 
 \subsection{Malicious Web Server}
 Then, to run the http server hosting the javascript exploiting the modem, run the following command, inside the root folder containing it.
 \begin{lstlisting}[numbers=none]
-npm install
-\end{lstlisting}
-
-In ./bin/www change the port on line 15 to the port which your target modem uses for the spectrum analyzer. 
-If the spectrum analyzer is protected by basic auth set loginRequired to true in ./routes/index.js.
-Finish by starting the malicious server with the following command:
-\begin{lstlisting}[numbers=none]
-npm start
+    sudo python exploit.py
 \end{lstlisting}
 
 \section{Replicating the Exploit}
-In order to execute the exploit test, the victim should click the exploit link.
-The exploit link has the following structure:
-\\\\
-\url{http://user:pass@a.127.0.0.1.2time.192.168.100.1.forever.uid.exploit.com:12345}
-\\\\
-This is interpreted by whonow which is charge of rebinding the domain name.
-In the link replace \enquote{user:pass} and 12345 with the credentials and correct port for the target cable modem. 
-If the modem does not require basic auth remove "user:pass@".
-The \enquote{uid} should also be replaced each time the exploit is tested. 
-An incrementing integer value such as \enquote{1, 2, 3\dots} works.
-This is used by whonow to distinguish users across different requests.
-It does not matter which domain is used, as whonow controls every domain.
+When a victim accesses the web server the modem will be exploited. For testing it on a remote cable modem change the ip on 32 in exploit.py to the ip address to the external ip address. This can be obtained from flask upon the initial request from the victim. 
+This will send a rop chain to the cable modem to be executed, and after that the modem will expect a shellcode to be send to it and executed. The F@st-3890 exploit will listen for tcp connections on port 1337 for the shellcode to be send over. The TC7230 rop chain creates a tcp connection to 194.168.22.11 for the shellcode to be send over and executed.
+In both cases the exploit.py will handle sending the shellcode automatically but in case of the TC7230 be sure the attackers ip local ip is 194.168.22.11 or change it in the rop chain in the static js file.
 
-\subsubsection*{Example with Basic Authorization}
-The Sagemcom F@ST 3890v3 modem requires basic authorization with credentials spectrum:spectrum, and the initial link for that modem would therefore look like this:
-\\
-\url{http://spectrum:spectrum@a.127.0.0.1.2time.192.168.100.1.forever.1.exploit.com:6080}
+\subsection{DNS rebind attack}
+The TC7230 repository also includes a exploit using DNS rebind attack which can be run using:
 
-\subsubsection*{Example without Basic Authorization}
-Technicolor TC72300 does not require any authorization and the initial link would therefore look like this:
-\\
-\url{http://a.127.0.0.1.2time.192.168.100.1.forever.1.exploit.com:8080}
+\begin{lstlisting}[numbers=none]
+    sudo python dns.py
+\end{lstlisting}
 
-\subsection{Executing the Link}
-When clicking on the link whonow will first redirect the browser to the http server, executing the javascript. 
-The javascript will keep trying to establish a websocket connection to the domain name. 
-After the second request, whonow will start to redirect requests against the domain name to the modem. 
-At some point the browser will update the IP address associated with the domain name and the javascript will establish the websocket connection.
-Once the websocket has been established, the buffer overflow attack is executed, flooding the program counter with A's, which crashes the modem. 
-
-The primary indication that the modem has crashed, will be the loss of connection to the modem. 
-The crash can also be witnessed through an open telnet session to the modem, or by reading from the modems debug output.
-This will be further explained in \appendixref{app:howto}.
+When clicking on the link malicious javascript and html will be served and the javascript will keep trying to establish a websocket connection to the domain name. 
+After the second request, the dns server will start to redirect requests against the domain name to the modem. 
+At some point the browser will update the IP address associated with the domain name and the javascript will establish a http connection to the cable modem initiating the exploit.
+This exploit only works for the TC7230 and will be explained in more details in the following chapter.
