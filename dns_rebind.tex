@@ -3,18 +3,18 @@
 The CM itself is not exposed directly to the internet, and can only be accessed from within the local network.
 This should not be considered a security measure, as the local network is not always protected.
 \exploitname{} gains access to the local network, by having the victim execute malicious code in their browser.
-While cross-origin resource sharing (CORS) rules usually prevents this attack, all cable modems listed in \appendixref{app:ExploredRouters} were found vulnerable to DNS Rebinding attacks and direct javascript requests.
+While cross-origin resource sharing (CORS) rules usually prevents this attack, all cable modems listed in the \href{https://cablehaunt.com/#faq-am-i-affected}{"Am I Affected"-FAQ} are found vulnerable to DNS Rebinding attacks and direct javascript requests.
 It is unlikely that this is an exhaustive list.
 Additionally, there are other ways to circumvent CORS security in the browser and the attacks work from any system connected to the network.
 
 \section{Executing the attack}
-The attack can be executed by having the victim run malicious javascript.
-A common avenue of attack would be a link that is opened in a browser, but could for example, also be done through ads on a trusted website or insecure email clients.
+While any code running on any device on the local network is a potential attack vector, the most common vector is javascript running in the victims browser, due to its easy of use and accessability
+A common avenue of attack would be a link that is opened in a browser, but could for example, also be done through ads on a trusted website or XXS.
 The exploit starts when the malicious code has been sent to the client, and is being executed.
 There are two verified ways of executing the request towards the modem.
 
 \section{Direct Javascript Request}
-Here the javascript running in the browser establishes a websocket connection, directly to the modem via the local IP address found in \appendixref{app:ExploredRouters}.
+Here the javascript running in the browser establishes a websocket connection, directly to the modem via its local IP address.
 Websocket is not explicitly covered by CORS and SOP\footnote{\url{https://knoxxs.github.io/programming/javascript/cors/2015/11/17/understanding-sop-cors\#what-about-websockets}}. 
 Therefore, browsers should not be relied upon to prevent this, as some will not. 
 While browsers will set the \mono{origin} parameter on all websocket requests, it is the servers responsibility to reject the request as needed. 
@@ -45,7 +45,19 @@ The steps of the attack are outlined below, and can be seen in \cref{fig:dns_att
   \label{fig:dns_attack}
 \end{figure}
 
+\section{Authorization}
 Some modems requires basic authorization before requests are accepted, however all tested modems have working default credentials.
-A complete list of the explored modems and their default credentials can be found in \appendixref{app:ExploredRouters}.
-In the case of basic authorization protection, the malicious website should be set up with the same credentials as the target modem.
-These credentials should then be added to the link, such as \url{http://username:password@malicioussite.com}, which will make the browser use these credential on every request, even after resolving to another IP.
+A complete list of the explored modems and their default credentials can be found in the \href{https://cablehaunt.com/#faq-am-i-affected}{"Am I Affected"-FAQ}.
+In the case of basic authorization protection, these can trivially be added to any direct javascript request.
+In the case of DNS rebinding, the credentials should be added to the link, e.g. \url{http://username:password@malicioussite.com}, which will make the browser use these credential on every request, even after resolving to another IP. 
+
+\section{Unreachable gadgets}
+When reaching the cable modem through javascript we have some interesting restrictions on which gadgets can be reached, see \cref{sec:return_sriented_rrogramming}. We are forced to use the WebSocket text frame protocol and as gadgets are just addresses sent over the WebSocket connection and we are limited to sending addresses and data that can be represented as valid utf-8 characters.
+
+For instance, the address 0x8080a864 can not directly be inserted in a WebSocket text frame. Any byte starting with b10, like 0x80 does, must be a trailing byte and no UTF-8 symbol have been started, the address is not a valid UTF-8 character.
+However, if we add 0xf2 to the address, it becomes valid, as 0xf2 starts a new UTF-8 symbol with 3 trailing bytes, here being 0x80, 0x80, 0xa8 and one ascii char 0x64.
+The following bytes cannot be present in any address or data used because of the utf-8 specification\footnote{\url{https://en.wikipedia.org/wiki/UTF-8\#Codepage_layout}}: 0xc0, 0xc1,0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff.
+Further more 0x2c and 0x00 cannot be used as 0x2c is ',' and is our json deliminator and 0x00 because we use strncpy. 
+Be aware that when inserting a byte sequence such as 0xf28080a864 it has to be shifted one character so the address align with the position for the gadget.
+The extra 0xf2 byte may now be positioned in another register such as a \$s register making this registers value limited during execution of the gadget.
+This also limits the values we can put on the stack, for instance we cannot write the local ip 192.168.0.10 as it contains 192 (0xC0) which is an invalid UTF-8 byte. In the cases were we need to call a function which is unreachable we can use other gadgets to add to registers together adding up to the desired value and jumping to that register instead. A python script to test and inform you how a potential register value can be represented by a UTF8-char can be found in the GitHub page for the \href{https://github.com/Lyrebirds/sagemcom-fast-3890-exploit}{Sagemcom F@st 3890 Exploit}.
